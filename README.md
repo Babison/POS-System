@@ -1,2 +1,2 @@
-# POS-System
-POS Sytem that manages inventory and other databases
+# Pos-System
+pos like admin page and full pludged system

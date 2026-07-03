@@ -1,0 +1,192 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+model audit_logs {
+  id         Int       @id @default(autoincrement())
+  user_id    Int?
+  action     String?   @db.VarChar(255)
+  table_name String?   @db.VarChar(100)
+  record_id  Int?
+  old_data   Json?
+  new_data   Json?
+  created_at DateTime? @default(now()) @db.Timestamp(6)
+  users      users?    @relation(fields: [user_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+}
+
+model categories {
+  id          Int        @id @default(autoincrement())
+  name        String     @db.VarChar(100)
+  description String?
+  created_at  DateTime?  @default(now()) @db.Timestamp(6)
+  products    products[]
+}
+
+model customers {
+  id             Int       @id @default(autoincrement())
+  name           String?   @db.VarChar(255)
+  phone          String?   @db.VarChar(20)
+  email          String?   @db.VarChar(100)
+  address        String?
+  loyalty_points Int?      @default(0)
+  created_at     DateTime? @default(now()) @db.Timestamp(6)
+  sales          sales[]
+}
+
+model inventory_logs {
+  id              Int       @id @default(autoincrement())
+  product_id      Int?
+  old_stock       Int?
+  new_stock       Int?
+  change_quantity Int?
+  action          String?   @db.VarChar(50)
+  user_id         Int?
+  created_at      DateTime? @default(now()) @db.Timestamp(6)
+  products        products? @relation(fields: [product_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  users           users?    @relation(fields: [user_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+}
+
+model notifications {
+  id         Int       @id @default(autoincrement())
+  title      String?   @db.VarChar(255)
+  message    String?
+  is_read    Boolean?  @default(false)
+  user_id    Int?
+  created_at DateTime? @default(now()) @db.Timestamp(6)
+  users      users?    @relation(fields: [user_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+}
+
+model products {
+  id             Int              @id @default(autoincrement())
+  barcode        String?          @unique @db.VarChar(100)
+  name           String           @db.VarChar(255)
+  description    String?
+  category_id    Int?
+  cost_price     Decimal?         @db.Decimal(10, 2)
+  selling_price  Decimal?         @db.Decimal(10, 2)
+  tax_percentage Decimal?         @default(0) @db.Decimal(5, 2)
+  unit           String?          @db.VarChar(50)
+  stock          Int?             @default(0)
+  reorder_level  Int?             @default(0)
+  weight_enabled Boolean?         @default(false)
+  image          String?
+  is_active      Boolean?         @default(true)
+  created_at     DateTime?        @default(now()) @db.Timestamp(6)
+  updated_at     DateTime?        @default(now()) @db.Timestamp(6)
+  inventory_logs inventory_logs[]
+  categories     categories?      @relation(fields: [category_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  purchase_items purchase_items[]
+  sale_items     sale_items[]
+}
+
+model purchase_items {
+  id          Int        @id @default(autoincrement())
+  purchase_id Int?
+  product_id  Int?
+  quantity    Int?
+  price       Decimal?   @db.Decimal(10, 2)
+  products    products?  @relation(fields: [product_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  purchases   purchases? @relation(fields: [purchase_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
+}
+
+model purchases {
+  id             Int              @id @default(autoincrement())
+  supplier_id    Int?
+  invoice_number String?          @db.VarChar(100)
+  total_amount   Decimal?         @db.Decimal(10, 2)
+  status         String?          @db.VarChar(50)
+  created_by     Int?
+  created_at     DateTime?        @default(now()) @db.Timestamp(6)
+  purchase_items purchase_items[]
+  users          users?           @relation(fields: [created_by], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  suppliers      suppliers?       @relation(fields: [supplier_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+}
+
+model roles {
+  id          Int     @id @default(autoincrement())
+  name        String  @unique @db.VarChar(50)
+  description String?
+  users       users[]
+}
+
+model sale_items {
+  id         Int       @id @default(autoincrement())
+  sale_id    Int?
+  product_id Int?
+  quantity   Int?
+  price      Decimal?  @db.Decimal(10, 2)
+  tax        Decimal?  @db.Decimal(10, 2)
+  total      Decimal?  @db.Decimal(10, 2)
+  products   products? @relation(fields: [product_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  sales      sales?    @relation(fields: [sale_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
+}
+
+model sales {
+  id             Int            @id @default(autoincrement())
+  invoice_number String?        @db.VarChar(100)
+  customer_id    Int?
+  cashier_id     Int?
+  subtotal       Decimal?       @db.Decimal(10, 2)
+  tax            Decimal?       @db.Decimal(10, 2)
+  discount       Decimal?       @db.Decimal(10, 2)
+  total          Decimal?       @db.Decimal(10, 2)
+  payment_method String?        @db.VarChar(50)
+  payment_status String?        @db.VarChar(50)
+  created_at     DateTime?      @default(now()) @db.Timestamp(6)
+  sale_items     sale_items[]
+  users          users?         @relation(fields: [cashier_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  customers      customers?     @relation(fields: [customer_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  transactions   transactions[]
+}
+
+model stores {
+  id         Int       @id @default(autoincrement())
+  name       String?   @db.VarChar(255)
+  address    String?
+  phone      String?   @db.VarChar(20)
+  created_at DateTime? @default(now()) @db.Timestamp(6)
+}
+
+model suppliers {
+  id         Int         @id @default(autoincrement())
+  name       String?     @db.VarChar(255)
+  phone      String?     @db.VarChar(20)
+  email      String?     @db.VarChar(100)
+  address    String?
+  gst_number String?     @db.VarChar(50)
+  created_at DateTime?   @default(now()) @db.Timestamp(6)
+  purchases  purchases[]
+}
+
+model transactions {
+  id                    Int       @id @default(autoincrement())
+  sale_id               Int?
+  amount                Decimal?  @db.Decimal(10, 2)
+  payment_method        String?   @db.VarChar(50)
+  transaction_reference String?   @db.VarChar(255)
+  status                String?   @db.VarChar(50)
+  created_at            DateTime? @default(now()) @db.Timestamp(6)
+  sales                 sales?    @relation(fields: [sale_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+}
+
+model users {
+  id             Int              @id @default(autoincrement())
+  name           String           @db.VarChar(100)
+  email          String           @unique @db.VarChar(100)
+  phone          String?          @db.VarChar(20)
+  password       String
+  role_id        Int?
+  is_active      Boolean?         @default(true)
+  created_at     DateTime?        @default(now()) @db.Timestamp(6)
+  updated_at     DateTime?        @default(now()) @db.Timestamp(6)
+  audit_logs     audit_logs[]
+  inventory_logs inventory_logs[]
+  notifications  notifications[]
+  purchases      purchases[]
+  sales          sales[]
+  roles          roles?           @relation(fields: [role_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+}
