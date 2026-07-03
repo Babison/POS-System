@@ -1,9 +1,9 @@
-import axios from 'axios';
+import axios from "axios";
+
+const API = "http://localhost:5000/api";
 
 export default {
   getSummary() {
-    return axios.get(
-      'http://localhost:5000/api/dashboard'
-    );
-  }
+    return axios.get(`${API}/dashboard`);
+  },
 };

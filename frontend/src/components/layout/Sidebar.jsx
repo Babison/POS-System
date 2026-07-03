@@ -1,10 +1,4 @@
-import {
-  FiHome,
-  FiBox,
-  FiShoppingCart,
-  FiUsers,
-  FiSettings
-} from 'react-icons/fi';
+import { Link } from "react-router-dom";
 
 export default function Sidebar() {
   return (
@@ -13,14 +7,15 @@ export default function Sidebar() {
         POS System
       </h1>
 
-      <nav className="space-y-4">
-        <div>🏠 Dashboard</div>
-        <div>📦 Products</div>
-        <div>📊 Inventory</div>
-        <div>🧾 Sales</div>
-        <div>👥 Customers</div>
-        <div>⚙️ Settings</div>
-      </nav>
+      <div className="space-y-4">
+        <Link className="block" to="/dashboard">
+          Dashboard
+        </Link>
+
+        <Link className="block" to="/pos">
+          POS
+        </Link>
+      </div>
     </div>
   );
 }

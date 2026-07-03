@@ -1,9 +1,9 @@
-import { useEffect, useState } from 'react';
-import dashboardService from '../../services/dashboard.service';
+import { useEffect, useState } from "react";
+import DashboardLayout from "../../components/layout/DashboardLayout";
+import dashboardService from "../../services/dashboard.service";
 
 export default function Dashboard() {
-  const [data, setData] =
-    useState(null);
+  const [data, setData] = useState(null);
 
   useEffect(() => {
     loadDashboard();
@@ -17,14 +17,14 @@ export default function Dashboard() {
   };
 
   if (!data)
-    return <div>Loading...</div>;
+    return (
+      <DashboardLayout>
+        Loading...
+      </DashboardLayout>
+    );
 
   return (
-    <>
-      <h1 className="text-3xl font-bold mb-6">
-        Dashboard
-      </h1>
-
+    <DashboardLayout>
       <div className="grid grid-cols-4 gap-6">
         <Card
           title="Products"
@@ -46,23 +46,23 @@ export default function Dashboard() {
           value={`₹${data.revenueToday}`}
         />
       </div>
-    </>
+    </DashboardLayout>
   );
 }
 
 function Card({
   title,
-  value
+  value,
 }) {
   return (
-    <div className="bg-white rounded-2xl p-6 shadow">
-      <h3 className="text-gray-500">
+    <div className="bg-white p-6 rounded-xl shadow">
+      <h2 className="text-gray-500">
         {title}
-      </h3>
+      </h2>
 
-      <p className="text-3xl font-bold mt-4">
+      <h1 className="text-4xl font-bold mt-4">
         {value}
-      </p>
+      </h1>
     </div>
   );
 }

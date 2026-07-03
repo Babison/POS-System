@@ -1,8 +1,8 @@
-import Sidebar from './Sidebar';
-import Navbar from './Navbar';
+import Sidebar from "./Sidebar";
+import Navbar from "./Navbar";
 
 export default function DashboardLayout({
-  children
+  children,
 }) {
   return (
     <div className="flex">
@@ -11,9 +11,7 @@ export default function DashboardLayout({
       <div className="flex-1 bg-gray-100 min-h-screen">
         <Navbar />
 
-        <div className="p-6">
-          {children}
-        </div>
+        <div className="p-6">{children}</div>
       </div>
     </div>
   );
